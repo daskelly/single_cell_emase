@@ -63,7 +63,6 @@ def main():
         try:
             gene_symbol = symb['out'][i]['symbol']
         except KeyError:
-            assert gene_id in symb['missing']
             gene_symbol = gene_id
         symbols[gene_id] = gene_symbol
         
