@@ -11,6 +11,7 @@ import sys, argparse
 import numpy as np
 from scipy import sparse
 from scipy.io import mmwrite
+import mygene
 
 def main():
     parser = argparse.ArgumentParser()
@@ -54,10 +55,18 @@ def main():
             counts_list[barcode] = cell_data[1]
     
     # Get the gene symbol for each gene ID
+    mg = mygene.MyGeneInfo()
+    symb = mg.querymany(expected_genes, scopes='ensembl.gene', returnall=True)
     symbols = dict()
-    for gene in expected_genes:
-        symbols[gene] = "symbol_here"
-    
+    for i in range(len(symb['out'])):
+        gene_id = symb['out'][i]['query']
+        try:
+            gene_symbol = symb['out'][i]['symbol']
+        except KeyError:
+            assert gene_id in symb['missing']
+            gene_symbol = gene_id
+        symbols[gene_id] = gene_symbol
+        
     # Print out a matrix of all the counts
     # First make a matrix, then write it as a sparse MTX to args.outdir
     barcodes = sorted(counts_list.keys())
